@@ -1,7 +1,12 @@
 import { cookies } from "next/headers";
 import crypto from "crypto";
+import { SESSION_COOKIE_NAME } from "./session-constants";
 
-const SESSION_COOKIE = "kyronex_admin_session";
+// NOTE: this file uses Node's "crypto" module, so it must only ever be
+// imported from code that runs on the Node.js runtime (API routes, server
+// components, layouts) — never from middleware.ts, which runs on the Edge
+// runtime. Middleware imports SESSION_COOKIE_NAME from
+// "./session-constants" directly instead.
 
 function getSecret() {
   return process.env.SESSION_SECRET || "dev-secret-change-me";
@@ -34,8 +39,8 @@ export function verifySessionToken(token: string | undefined): boolean {
 }
 
 export function isAuthenticated(): boolean {
-  const token = cookies().get(SESSION_COOKIE)?.value;
+  const token = cookies().get(SESSION_COOKIE_NAME)?.value;
   return verifySessionToken(token);
 }
 
-export const SESSION_COOKIE_NAME = SESSION_COOKIE;
+export { SESSION_COOKIE_NAME };
